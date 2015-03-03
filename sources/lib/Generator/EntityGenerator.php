@@ -45,6 +45,7 @@ class EntityGenerator extends BaseGenerator
                         'entity'    => Inflector::studlyCaps($this->relation),
                         'relation'  => $this->relation,
                         'schema'    => $this->schema,
+                        'doc_properties' => $this->createDocProperties(),
                         'flexible_container' => $this->flexible_container,
                         'flexible_container_class' => array_reverse(explode('\\', $this->flexible_container))[0]
                     ]
@@ -52,6 +53,33 @@ class EntityGenerator extends BaseGenerator
             );
 
         return $output;
+    }
+
+    /**
+     * formatDocProperties
+     *
+     * @access protected
+     * @return string
+     */
+    protected function createDocProperties()
+    {
+        $table_oid          = $this->checkRelationInformation();
+        $field_informations = $this->getFieldInformation($table_oid);
+
+        $comments = [];
+        foreach ($field_informations as $info) {
+
+            $converterClient = $this->getSession()
+                ->getPoolerForType('converter')
+                ->getClient($info['type']);
+
+            $comments[] = sprintf(" * @property %s $%s"
+                , $converterClient->toPhpType()
+                , $info['name']
+            );
+        }
+
+        return count($comments) > 0 ? join("\n", $comments) : ' *';
     }
 
     /**
@@ -75,6 +103,8 @@ use {:flexible_container:};
  * {:schema:}.{:relation:}
  *
  * @see FlexibleEntity
+ *
+{:doc_properties:}
  */
 class {:entity:} extends {:flexible_container_class:}
 {

@@ -223,4 +223,67 @@ abstract class BaseGenerator
 
         return $this;
     }
+
+    /**
+     * getFieldInformation
+     *
+     * Fetch a table field information.
+     *
+     * @access protected
+     * @param  int $table_oid
+     * @return array $informations
+     * @throws GeneratorException
+     */
+    protected function getFieldInformation($table_oid)
+    {
+        $fields_info = $this
+            ->getInspector()
+            ->getTableFieldInformation($table_oid)
+        ;
+
+        if ($fields_info === null) {
+            throw new GeneratorException(
+                sprintf(
+                    "Error while fetching fields information for table oid '%s'.",
+                    $table_oid
+                )
+            );
+        }
+
+        return $fields_info;
+    }
+
+
+    /**
+     * checkRelationInformation
+     *
+     * Check if the given schema and relation exist. If so, the table oid is
+     * returned, otherwise a GeneratorException is thrown.
+     *
+     * @access protected
+     * @throw  GeneratorException
+     * @return int $oid
+     * @throws GeneratorException
+     */
+    protected function checkRelationInformation()
+    {
+        if ($this->getInspector()->getSchemaOid($this->schema) === null) {
+            throw new GeneratorException(sprintf("Schema '%s' not found.", $this->schema));
+        }
+
+        $table_oid = $this->getInspector()->getTableOid($this->schema, $this->relation);
+
+        if ($table_oid === null) {
+            throw new GeneratorException(
+                sprintf(
+                    "Relation '%s' could not be found in schema '%s'.",
+                    $this->relation,
+                    $this->schema
+                )
+            );
+        }
+
+        return $table_oid;
+    }
+
 }
