@@ -154,65 +154,6 @@ TEXT;
         );
     }
 
-    /**
-     * checkRelationInformation
-     *
-     * Check if the given schema and relation exist. If so, the table oid is
-     * returned, otherwise a GeneratorException is thrown.
-     *
-     * @access private
-     * @throws GeneratorException
-     * @return int $oid
-     */
-    private function checkRelationInformation()
-    {
-        if ($this->getInspector()->getSchemaOid($this->schema) === null) {
-            throw new GeneratorException(sprintf("Schema '%s' not found.", $this->schema));
-        }
-
-        $table_oid = $this->getInspector()->getTableOid($this->schema, $this->relation);
-
-        if ($table_oid === null) {
-            throw new GeneratorException(
-                sprintf(
-                    "Relation '%s' could not be found in schema '%s'.",
-                    $this->relation,
-                    $this->schema
-                )
-            );
-        }
-
-        return $table_oid;
-    }
-
-    /**
-     * getFieldInformation
-     *
-     * Fetch a table field information.
-     *
-     * @access protected
-     * @param  int   $table_oid
-     * @throws GeneratorException
-     * @return array $informations
-     */
-    protected function getFieldInformation($table_oid)
-    {
-        $fields_info = $this
-            ->getInspector()
-            ->getTableFieldInformation($table_oid)
-            ;
-
-        if ($fields_info === null) {
-            throw new GeneratorException(
-                sprintf(
-                    "Error while fetching fields information for table oid '%s'.",
-                    $table_oid
-                )
-            );
-        }
-
-        return $fields_info;
-    }
 
     /**
      * getPrimaryKey
